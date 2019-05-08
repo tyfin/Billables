@@ -35,7 +35,6 @@ namespace Billables.Models
                 if (startDate.DayOfWeek != DayOfWeek.Saturday && startDate.DayOfWeek != DayOfWeek.Sunday)
                 {
                     days++;
-                    System.Diagnostics.Debug.WriteLine("Day added: {0}", startDate);
                 }
                 startDate = startDate.AddDays(1);
             }

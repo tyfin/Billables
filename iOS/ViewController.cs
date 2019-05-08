@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Billables.Models;
 using UIKit;
 
@@ -16,6 +17,10 @@ namespace Billables.iOS
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
+
+            //Keyboard dismissal
+            var g = new UITapGestureRecognizer(() => View.EndEditing(true));
+            View.AddGestureRecognizer(g);
         }
 
         public override void DidReceiveMemoryWarning()
@@ -26,22 +31,36 @@ namespace Billables.iOS
 
         partial void onButtonClick(UIButton sender)
         {
+
+            //Dismiss keyboard
+            View.EndEditing(true);
+
+            // Prevents crashing if any of the fields are empty.  Find a more elegant solution.
+            if (new[] {billTF.Text, accTF.Text, vacationTF.Text, firmHolidayTF.Text }.Contains(""))
+            {
+                return;
+            }
+
+            // Update
+            updateModel();
+            updateResults();
+        }
+
+        private void updateModel()
+        {
             bill.currentBill = float.Parse(billTF.Text);
             bill.currentAcc = float.Parse(accTF.Text);
             bill.vacationDays = int.Parse(vacationTF.Text);
             bill.firmHolidays = int.Parse(firmHolidayTF.Text);
-            Console.WriteLine("Button clicked.");
             bill.Calculate();
-            Console.WriteLine("Calculations run.");
-            updateResults();
         }
 
         private void updateResults()
         {
             billYearLabel.Text = string.Format("{0}", bill.billRemaining);
-            billDailyLabel.Text = string.Format("{0:N2}", bill.billDaily);
+            billDailyLabel.Text = string.Format("{0:N1}", bill.billDaily);
             accYearLabel.Text = string.Format("{0}", bill.accRemaining);
-            accDailyLabel.Text = string.Format("{0:N2}", bill.accDaily);
+            accDailyLabel.Text = string.Format("{0:N1}", bill.accDaily);
         }
     }
 }
